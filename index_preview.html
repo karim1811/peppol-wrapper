@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Peppol Invoice Manager</title>
+  <style>
+    :root {
+      --bg:#f5f7fa; --card:#fff; --text:#1f2937; --muted:#6b7280;
+      --primary:#2563eb; --success:#16a34a; --danger:#dc2626; --border:#e5e7eb; --radius:.5rem;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+    .navbar{background:var(--card);border-bottom:1px solid var(--border);padding:1rem 0;margin-bottom:2rem}
+    .navbar .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{font-weight:700;font-size:1.25rem;color:var(--text);text-decoration:none}
+    .nav-links{display:flex;gap:1.5rem}
+    .nav-link{color:var(--muted);text-decoration:none;font-weight:500}
+    .nav-link:hover{color:var(--primary)}
+    .container{max-width:1100px;margin:0 auto;padding:0 1rem}
+    .invoice-form{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;margin-bottom:1.5rem}
+    .form-section{margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+    .form-section:last-of-type{border-bottom:none}
+    .form-section h2{font-size:1.1rem;margin-bottom:1rem}
+    .form-section h3{font-size:1rem;margin:1rem 0 .5rem}
+    .form-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;margin-bottom:1rem}
+    .form-group{display:flex;flex-direction:column}
+    .form-group label{font-size:.875rem;font-weight:500;margin-bottom:.25rem}
+    .form-group input,.form-group select{padding:.5rem .75rem;border:1px solid var(--border);border-radius:var(--radius);font-size:.95rem;background:#fff;color:var(--text)}
+    .invoice-line{background:#f9fafb;border:1px solid var(--border);border-radius:var(--radius);padding:1rem;margin-bottom:.75rem}
+    .form-actions{display:flex;gap:.75rem;margin-top:1.5rem}
+    .btn-primary,.btn-secondary{border:none;padding:.65rem 1rem;border-radius:var(--radius);font-size:.95rem;font-weight:500;cursor:pointer}
+    .btn-primary{background:var(--primary);color:#fff}
+    .btn-secondary{background:#e5e7eb;color:var(--text)}
+    .btn-primary.cta{background:var(--success)}
+    .btn-primary:hover{opacity:.95}
+    .btn-secondary:hover{background:#d1d5db}
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:50}
+    .modal.hidden{display:none}
+    .modal-content{background:var(--card);border-radius:var(--radius);padding:1.5rem;width:90%;max-width:720px;max-height:85vh;overflow:auto;position:relative}
+    .close{position:absolute;top:.75rem;right:1rem;font-size:1.5rem;cursor:pointer;background:transparent;border:none}
+    #resultContent{background:#111827;color:#e5e7eb;padding:1rem;border-radius:var(--radius);margin:1rem 0;white-space:pre-wrap;word-break:break-word}
+    .footer{text-align:center;padding:1.5rem;color:var(--muted);font-size:.875rem}
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="container">
+      <a href="#" class="logo">Peppol Invoice Manager</a>
+      <div class="nav-links">
+        <a href="#" class="nav-link">Nouvelle facture</a>
+        <a href="#" class="nav-link">Mes factures</a>
+      </div>
+    </div>
+  </nav>
+  <div class="container">
+    <h1>Nouvelle facture Peppol</h1>
+    <form id="invoiceForm" class="invoice-form" style="margin-top:1rem">
+      <section class="form-section">
+        <h2>Informations vendeur</h2>
+        <div class="form-row">
+          <div class="form-group"><label>Nom *</label><input type="text" required></div>
+          <div class="form-group"><label>ID Endpoint *</label><input type="text" required></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Rue *</label><input type="text" required></div>
+          <div class="form-group"><label>Ville *</label><input type="text" required></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Code postal *</label><input type="text" required></div>
+          <div class="form-group"><label>Pays</label><input type="text" value="FR"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>SIRET / ID légal *</label><input type="text" required></div>
+        </div>
+      </section>
+      <section class="form-section">
+        <h2>Informations acheteur</h2>
+        <div class="form-row">
+          <div class="form-group"><label>Nom *</label><input type="text" required></div>
+          <div class="form-group"><label>ID Endpoint *</label><input type="text" required></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Rue *</label><input type="text" required></div>
+          <div class="form-group"><label>Ville *</label><input type="text" required></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Code postal *</label><input type="text" required></div>
+          <div class="form-group"><label>Pays</label><input type="text" value="FR"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>SIRET / ID légal *</label><input type="text" required></div>
+        </div>
+      </section>
+      <section class="form-section">
+        <h2>Facture</h2>
+        <div class="form-row">
+          <div class="form-group"><label>Numéro *</label><input type="text" required></div>
+          <div class="form-group"><label>Date d'émission *</label><input type="date" required></div>
+          <div class="form-group"><label>Date d'échéance</label><input type="date"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Devise</label><select><option>EUR</option><option>USD</option><option>GBP</option></select></div>
+          <div class="form-group"><label>IBAN</label><input type="text"></div>
+        </div>
+        <h3>Lignes de facture</h3>
+        <div id="linesContainer">
+          <div class="invoice-line">
+            <div class="form-row">
+              <div class="form-group"><label>Description *</label><input type="text" required></div>
+              <div class="form-group"><label>Quantité</label><input type="number" value="1" min="0.01"></div>
+              <div class="form-group"><label>Prix unitaire HT</label><input type="number" step="0.01" min="0" required></div>
+              <div class="form-group"><label>TVA (%)</label><input type="number" value="20" step="0.1"></div>
+            </div>
+          </div>
+        </div>
+        <button type="button" class="btn-secondary" style="margin-top:.5rem">+ Ajouter une ligne</button>
+      </section>
+      <div class="form-actions">
+        <button type="submit" class="btn-primary">Valider la facture</button>
+        <button type="button" class="btn-secondary">Générer XML seulement</button>
+      </div>
+    </form>
+  </div>
+  <footer class="footer">Peppol Invoice Manager — Solution de facturation électronique</footer>
+  <div id="resultModal" class="modal hidden">
+    <div class="modal-content">
+      <button class="close" type="button">&times;</button>
+      <h2 id="resultTitle">Résultat</h2>
+      <pre id="resultContent"></pre>
+      <button class="btn-primary" type="button">Télécharger XML</button>
+      <button class="btn-primary cta" type="button">Envoyer la facture</button>
+    </div>
+  </div>
+  <script>
+    document.getElementById('invoiceForm').addEventListener('submit', function(e){
+      e.preventDefault();
+      document.getElementById('resultTitle').textContent='Validation';
+      document.getElementById('resultContent').textContent='Formulaire prêt. (Backend à connecter)';
+      document.getElementById('resultModal').classList.remove('hidden');
+    });
+    document.querySelector('.close').addEventListener('click', function(){
+      document.getElementById('resultModal').classList.add('hidden');
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Peppol Invoice Manager</title>
+  <style>
+    :root {
+      --bg: #f3f6fb;
+      --card: #ffffff;
+      --text: #111827;
+      --muted: #6b7280;
+      --primary: #0f3fc2;
+      --accent: #10b981;
+      --border: #e5e7eb;
+      --radius: .75rem;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+    .navbar{background:rgba(255,255,255,.9);backdrop-filter:blur(6px);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:20}
+    .navbar .container{display:flex;align-items:center;justify-content:space-between;padding:.75rem 1rem;max-width:1200px;margin:0 auto}
+    .logo{display:flex;align-items:center;gap:.6rem;font-weight:800;font-size:1.15rem;color:var(--text);text-decoration:none}
+    .logo img{height:36px;width:36px;object-fit:contain}
+    .nav-links{display:flex;gap:1.25rem}
+    .nav-link{color:var(--muted);text-decoration:none;font-weight:600;font-size:.95rem}
+    .nav-link:hover{color:var(--primary)}
+    .hero{background:linear-gradient(135deg,#0f3fc2,#10b981);color:#fff;padding:4rem 1rem;text-align:center}
+    .hero h1{font-size:2.4rem;line-height:1.2;margin-bottom:.6rem}
+    .hero p{font-size:1.1rem;opacity:.95;max-width:640px;margin:0 auto 1.25rem}
+    .container{max-width:1100px;margin:0 auto;padding:2rem 1rem}
+    .invoice-form{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;box-shadow:0 6px 24px rgba(15,63,194,.08)}
+    .form-section{margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+    .form-section:last-of-type{border-bottom:none}
+    .form-section h2{font-size:1.15rem;margin-bottom:1rem;color:var(--primary)}
+    .form-section h3{font-size:1rem;margin:1rem 0 .5rem;color:#374151}
+    .form-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;margin-bottom:1rem}
+    .form-group{display:flex;flex-direction:column}
+    .form-group label{font-size:.875rem;font-weight:600;margin-bottom:.3rem;color:#374151}
+    .form-group input,.form-group select{padding:.55rem .75rem;border:1px solid var(--border);border-radius:var(--radius);font-size:.95rem;background:#fff;color:var(--text);transition:.2s border-color}
+    .form-group input:focus,.form-group select:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(15,63,194,.12)}
+    .invoice-line{background:#f9fafb;border:1px solid var(--border);border-radius:var(--radius);padding:1rem;margin-bottom:.75rem}
+    .form-actions{display:flex;gap:.75rem;flex-wrap:wrap;margin-top:1.5rem}
+    .btn-primary,.btn-secondary{border:none;padding:.7rem 1.1rem;border-radius:var(--radius);font-size:.95rem;font-weight:600;cursor:pointer;color:#fff}
+    .btn-primary{background:var(--primary)}
+    .btn-secondary{background:#e5e7eb;color:var(--text)}
+    .btn-primary.cta{background:var(--accent)}
+    .btn-primary:hover{filter:brightness(.95)}
+    .btn-secondary:hover{background:#d1d5db}
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:50}
+    .modal.hidden{display:none}
+    .modal-content{background:var(--card);border-radius:var(--radius);padding:1.5rem;width:92%;max-width:720px;max-height:85vh;overflow:auto;position:relative;box-shadow:0 10px 40px rgba(15,63,194,.18)}
+    .close{position:absolute;top:.75rem;right:1rem;font-size:1.6rem;cursor:pointer;background:transparent;border:none;color:var(--muted)}
+    #resultContent{background:#0b1020;color:#e5e7eb;padding:1rem;border-radius:var(--radius);margin:1rem 0;white-space:pre-wrap;word-break:break-word;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace}
+    .footer{text-align:center;padding:2rem;color:var(--muted);font-size:.9rem}
+    .pricing{margin-top:2rem}
+    .pricing h2{text-align:center;margin-bottom:1.25rem;color:var(--text)}
+    .pricing-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;box-shadow:0 4px 18px rgba(15,63,194,.06)}
+    .price{font-size:2rem;font-weight:800;color:var(--primary);margin:.5rem 0}
+    .price span{font-size:.95rem;color:var(--muted);font-weight:600}
+    ul{padding-left:1.1rem;margin:.5rem 0 1rem;color:#374151}
+    li{margin:.35rem 0}
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="container">
+      <a href="#" class="logo">
+        <img src="file:///C:/Users/karim/Desktop/projet%20facture%20peppol/peppol%20logo%202.png" alt="logo" onerror="this.style.display='none'">
+        Peppol Invoice Manager
+      </a>
+      <div class="nav-links">
+        <a href="#form" class="nav-link">Nouvelle facture</a>
+        <a href="#pricing" class="nav-link">Tarifs</a>
+      </div>
+    </div>
+  </nav>
+  <div class="hero">
+    <h1>Facturation électronique via Peppol</h1>
+    <p>Envoyez des factures électroniques structurées à vos clients connectés au réseau Peppol. Simple, rapide, conforme.</p>
+  </div>
+  <div class="container" id="form">
+    <form id="invoiceForm" class="invoice-form">
+      <section class="form-section">
+        <h2>Informations vendeur</h2>
+        <div class="form-row">
+          <div class="form-group"><label>Nom *</label><input type="text" required></div>
+          <div class="form-group"><label>ID Endpoint *</label><input type="text" required></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Rue *</label><input type="text" required></div>
+          <div class="form-group"><label>Ville *</label><input type="text" required></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Code postal *</label><input type="text" required></div>
+          <div class="form-group"><label>Pays</label><input type="text" value="FR"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>SIRET / ID légal *</label><input type="text" required></div>
+        </div>
+      </section>
+      <section class="form-section">
+        <h2>Informations acheteur</h2>
+        <div class="form-row">
+          <div class="form-group"><label>Nom *</label><input type="text" required></div>
+          <div class="form-group"><label>ID Endpoint *</label><input type="text" required></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Rue *</label><input type="text" required></div>
+          <div class="form-group"><label>Ville *</label><input type="text" required></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Code postal *</label><input type="text" required></div>
+          <div class="form-group"><label>Pays</label><input type="text" value="FR"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>SIRET / ID légal *</label><input type="text" required></div>
+        </div>
+      </section>
+      <section class="form-section">
+        <h2>Facture</h2>
+        <div class="form-row">
+          <div class="form-group"><label>Numéro *</label><input type="text" required></div>
+          <div class="form-group"><label>Date d'émission *</label><input type="date" required></div>
+          <div class="form-group"><label>Date d'échéance</label><input type="date"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Devise</label><select><option>EUR</option><option>USD</option><option>GBP</option></select></div>
+          <div class="form-group"><label>IBAN</label><input type="text"></div>
+        </div>
+        <h3>Lignes de facture</h3>
+        <div id="linesContainer">
+          <div class="invoice-line">
+            <div class="form-row">
+              <div class="form-group"><label>Description *</label><input type="text" required></div>
+              <div class="form-group"><label>Quantité</label><input type="number" value="1" min="0.01"></div>
+              <div class="form-group"><label>Prix unitaire HT</label><input type="number" step="0.01" min="0" required></div>
+              <div class="form-group"><label>TVA (%)</label><input type="number" value="20" step="0.1"></div>
+            </div>
+          </div>
+        </div>
+        <button type="button" class="btn-secondary" style="margin-top:.5rem">+ Ajouter une ligne</button>
+      </section>
+      <div class="form-actions">
+        <button type="submit" class="btn-primary">Valider la facture</button>
+        <button type="button" class="btn-secondary">Générer XML seulement</button>
+      </div>
+    </form>
+  </div>
+  <div class="container" id="pricing">
+    <div class="pricing">
+      <h2>Tarifs</h2>
+      <div class="pricing-cards">
+        <div class="card">
+          <h3>Free</h3>
+          <div class="price">0€<span>/mois</span></div>
+          <ul>
+            <li>3 factures/mois</li>
+            <li>Validation XML</li>
+            <li>Support email</li>
+          </ul>
+          <button class="btn-secondary" style="width:100%">Commencer</button>
+        </div>
+        <div class="card">
+          <h3>Pro</h3>
+          <div class="price">19€<span>/mois</span></div>
+          <ul>
+            <li>Factures illimitées</li>
+            <li>Envoi direct Peppol</li>
+            <li>Support prioritaire</li>
+            <li>Historique complet</li>
+          </ul>
+          <button class="btn-primary cta" style="width:100%">S'abonner</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">Peppol Invoice Manager — Solution de facturation électronique</footer>
+  <div id="resultModal" class="modal hidden">
+    <div class="modal-content">
+      <button class="close" type="button">&times;</button>
+      <h2 id="resultTitle">Résultat</h2>
+      <pre id="resultContent"></pre>
+      <button class="btn-primary" type="button">Télécharger XML</button>
+      <button class="btn-primary cta" type="button">Envoyer la facture</button>
+    </div>
+  </div>
+  <script>
+    document.getElementById('invoiceForm').addEventListener('submit', function(e){
+      e.preventDefault();
+      document.getElementById('resultTitle').textContent='Validation';
+      document.getElementById('resultContent').textContent='Formulaire prêt. (Backend à connecter)';
+      document.getElementById('resultModal').classList.remove('hidden');
+    });
+    document.querySelector('.close').addEventListener('click', function(){
+      document.getElementById('resultModal').classList.add('hidden');
+    });
+  </script>
+</body>
+</html>

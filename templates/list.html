@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Mes factures</h1>
+<p class="subtitle">Historique des factures générées ce mois-ci.</p>
+
+<div class="stats">
+    <div class="stat-card">
+        <div class="stat-value" id="used">{{ used }}</div>
+        <div class="stat-label">Factures utilisées</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ limit }}</div>
+        <div class="stat-label">Limite mensuelle (Free)</div>
+    </div>
+</div>
+
+<div class="table-wrap">
+    <table class="invoices-table">
+        <thead>
+            <tr>
+                <th>Numéro</th>
+                <th>Date</th>
+                <th>Acheteur</th>
+                <th>Montant TTC</th>
+                <th>Statut</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for inv in invoices %}
+            <tr>
+                <td>{{ inv.number }}</td>
+                <td>{{ inv.date }}</td>
+                <td>{{ inv.buyer }}</td>
+                <td>{{ inv.total_ttc }} €</td>
+                <td>
+                    <span class="badge {{ 'badge-success' if inv.sent else 'badge-draft' }}">
+                        {{ 'Envoyée' if inv.sent else 'Brouillon' }}
+                    </span>
+                </td>
+                <td>
+                    <a href="/invoices/{{ inv.id }}/xml" class="link">XML</a>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="6" class="empty">Aucune facture pour l'instant.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

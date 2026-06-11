@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Peppol Invoice Manager</title>
+    <link rel="stylesheet" href="static/css/style.css">
+    <link rel="stylesheet" href="static/css/list.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Nouvelle facture Peppol</h1>
+        <form id="invoiceForm" class="invoice-form">
+            <section class="form-section">
+                <h2>Informations vendeur</h2>
+                <div class="form-row">
+                    <div class="form-group"><label for="seller_name">Nom *</label><input type="text" id="seller_name" name="seller_name" required></div>
+                    <div class="form-group"><label for="seller_endpoint_id">ID Endpoint *</label><input type="text" id="seller_endpoint_id" name="seller_endpoint_id" required></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label for="seller_street">Rue *</label><input type="text" id="seller_street" name="seller_street" required></div>
+                    <div class="form-group"><label for="seller_city">Ville *</label><input type="text" id="seller_city" name="seller_city" required></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label for="seller_postal">Code postal *</label><input type="text" id="seller_postal" name="seller_postal" required></div>
+                    <div class="form-group"><label for="seller_country">Pays</label><input type="text" id="seller_country" name="seller_country" value="FR"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label for="seller_legal_id">SIRET / ID légal *</label><input type="text" id="seller_legal_id" name="seller_legal_id" required></div>
+                </div>
+            </section>
+            <section class="form-section">
+                <h2>Informations acheteur</h2>
+                <div class="form-row">
+                    <div class="form-group"><label for="buyer_name">Nom *</label><input type="text" id="buyer_name" name="buyer_name" required></div>
+                    <div class="form-group"><label for="buyer_endpoint_id">ID Endpoint *</label><input type="text" id="buyer_endpoint_id" name="buyer_endpoint_id" required></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label for="buyer_street">Rue *</label><input type="text" id="buyer_street" name="buyer_street" required></div>
+                    <div class="form-group"><label for="buyer_city">Ville *</label><input type="text" id="buyer_city" name="buyer_city" required></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label for="buyer_postal">Code postal *</label><input type="text" id="buyer_postal" name="buyer_postal" required></div>
+                    <div class="form-group"><label for="buyer_country">Pays</label><input type="text" id="buyer_country" name="buyer_country" value="FR"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label for="buyer_legal_id">SIRET / ID légal *</label><input type="text" id="buyer_legal_id" name="buyer_legal_id" required></div>
+                </div>
+            </section>
+            <section class="form-section">
+                <h2>Facture</h2>
+                <div class="form-row">
+                    <div class="form-group"><label for="invoice_number">Numéro *</label><input type="text" id="invoice_number" name="invoice_number" required></div>
+                    <div class="form-group"><label for="issue_date">Date d'émission *</label><input type="date" id="issue_date" name="issue_date" required></div>
+                    <div class="form-group"><label for="due_date">Date d'échéance</label><input type="date" id="due_date" name="due_date"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="currency">Devise</label>
+                        <select id="currency" name="currency"><option value="EUR">EUR</option><option value="USD">USD</option><option value="GBP">GBP</option></select>
+                    </div>
+                    <div class="form-group"><label for="iban">IBAN</label><input type="text" id="iban" name="iban"></div>
+                </div>
+                <h3>Lignes de facture</h3>
+                <div id="linesContainer">
+                    <div class="invoice-line">
+                        <div class="form-row">
+                            <div class="form-group"><label>Description *</label><input type="text" name="lines[0][description]" required></div>
+                            <div class="form-group"><label>Quantité</label><input type="number" name="lines[0][quantity]" value="1" step="0.01" min="0.01"></div>
+                            <div class="form-group"><label>Prix unitaire HT</label><input type="number" name="lines[0][unit_price]" step="0.01" min="0" required></div>
+                            <div class="form-group"><label>TVA (%)</label><input type="number" name="lines[0][tax_percent]" value="20" step="0.1"></div>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" id="addLine" class="btn-secondary">+ Ajouter une ligne</button>
+            </section>
+            <div class="form-actions">
+                <button type="submit" name="action" value="validate" class="btn-primary">Valider la facture</button>
+                <button type="submit" name="action" value="build" class="btn-secondary">Générer XML seulement</button>
+            </div>
+        </form>
+    </div>
+    <footer class="footer">Peppol Invoice Manager — Solution de facturation électronique</footer>
+    <div id="resultModal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="resultTitle">Résultat</h2>
+            <pre id="resultContent"></pre>
+            <button id="downloadXml" class="btn-primary">Télécharger XML</button>
+            <button id="sendInvoice" class="btn-primary cta">Envoyer la facture</button>
+        </div>
+    </div>
+    <script src="static/js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Peppol Bridge — Documentation API</title>
+  <style>
+    :root{--bg:#f6f8fb;--surface:#fff;--text:#0b1220;--muted:#475569;--primary:#0f3fc2;--accent:#10b981;--accent2:#0ea5e9;--border:#e5e7eb;--radius:.75rem;--shadow:0 18px 45px rgba(15,63,194,.12)}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.7}
+    .container{max-width:900px;margin:0 auto;padding:0 1.25rem}
+    .nav{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.9);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+    .nav .inner{display:flex;align-items:center;justify-content:space-between;height:56px;max-width:900px;margin:0 auto;padding:0 1.25rem}
+    .brand{font-weight:900;font-size:1.1rem;color:var(--primary)}
+    .brand a{text-decoration:none;color:inherit}
+    h1{font-size:2rem;margin:2rem 0 .5rem}
+    h2{font-size:1.35rem;margin:2.5rem 0 .75rem;color:var(--primary);border-bottom:2px solid var(--border);padding-bottom:.4rem}
+    h3{font-size:1.05rem;margin:1.5rem 0 .4rem}
+    p{color:var(--muted);margin-bottom:.75rem}
+    .endpoint{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin:1rem 0;overflow:hidden;box-shadow:var(--shadow)}
+    .endpoint-head{display:flex;align-items:center;gap:.75rem;padding:.85rem 1.1rem;background:#f8fafc;border-bottom:1px solid var(--border)}
+    .method{font-weight:800;font-size:.75rem;padding:.25rem .6rem;border-radius:.4rem;color:#fff;letter-spacing:.5px}
+    .method-post{background:var(--accent)}
+    .method-get{background:var(--accent2)}
+    .path{font-weight:700;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,monospace;font-size:.9rem}
+    .endpoint-body{padding:1.1rem}
+    .code{background:#0b1020;color:#e5e7eb;padding:1rem;border-radius:.65rem;margin:.75rem 0;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,monospace;white-space:pre-wrap;word-break:break-word;font-size:.85rem;overflow-x:auto}
+    .label{font-weight:700;font-size:.8rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:.75rem}
+    .param-table{width:100%;border-collapse:collapse;margin:.5rem 0 .75rem}
+    .param-table th,.param-table td{text-align:left;padding:.45rem .65rem;border:1px solid var(--border);font-size:.85rem}
+    .param-table th{background:#f8fafc;font-weight:700}
+    .required{color:#dc2626;font-weight:700}
+    .optional{color:var(--muted)}
+    .step{background:linear-gradient(135deg,#eef2ff,#ecfdf5);border:1px solid #dbeafe;border-radius:var(--radius);padding:1.1rem;margin:1rem 0}
+    .step h3{margin-top:0}
+    .tag{display:inline-block;background:#eef2ff;color:var(--primary);font-size:.75rem;font-weight:700;padding:.15rem .5rem;border-radius:.3rem;margin-right:.3rem}
+    .warn{background:#fef3c7;border:1px solid #fbbf24;border-radius:.5rem;padding:.75rem;margin:.75rem 0;font-size:.9rem}
+    .footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem}
+    ul{padding-left:1.1rem;margin:.4rem 0 .75rem;color:#374151}
+    li{margin:.3rem 0}
+    a{color:var(--primary)}
+  </style>
+</head>
+<body>
+<nav class="nav">
+  <div class="inner">
+    <span class="brand"><a href="/">← Peppol Bridge</a></span>
+    <span style="font-size:.85rem;color:var(--muted)">Documentation API v1</span>
+  </div>
+</nav>
+
+<div class="container">
+
+  <h1>Documentation API</h1>
+  <p>Integrez Peppol Bridge a votre logiciel comptable en 30 minutes. Deux methodes : <strong>CSV import</strong> (le plus simple) ou <strong>Webhook JSON</strong> (temps reel).</p>
+
+  <div class="step">
+    <h3>Demarrage rapide en 3 etapes</h3>
+    <ol>
+      <li><strong>Creez un compte</strong> — <code>POST /api/tenants/register</code> pour obtenir votre API key</li>
+      <li><strong>Testez en CSV</strong> — <code>POST /api/invoices/import-csv</code> avec <code>?send=false</code></li>
+      <li><strong>Passez en production</strong> — retirez <code>?send=false</code> ou utilisez le webhook</li>
+    </ol>
+  </div>
+
+  <!-- AUTH -->
+  <h2>Authentification</h2>
+  <p>Tous les endpoints API requierent une <strong>API key</strong> dans le header <code>X-API-Key</code>.</p>
+
+  <div class="endpoint">
+    <div class="endpoint-head">
+      <span class="method method-post">POST</span>
+      <span class="path">/api/tenants/register</span>
+    </div>
+    <div class="endpoint-body">
+      <p>Cree un nouveau tenant et retourne une API key.</p>
+      <div class="label">Request Body (JSON)</div>
+      <div class="code">{
+  "name": "Mon Editeur SAS",
+  "email": "tech@monediteur.fr"
+}</div>
+      <div class="label">Response 200</div>
+      <div class="code">{
+  "api_key": "pb_a1b2c3d4e5f6...",
+  "message": "Store this API key. It won't be shown again.",
+  "name": "Mon Editeur SAS",
+  "hint": "Use header X-API-Key: &lt;api_key&gt; on all API calls"
+}</div>
+      <div class="warn">⚠️ Stockez cette API key. Elle ne sera plus jamais affichee.</div>
+    </div>
+  </div>
+
+  <div class="endpoint">
+    <div class="endpoint-head">
+      <span class="method method-get">GET</span>
+      <span class="path">/api/tenants/me</span>
+    </div>
+    <div class="endpoint-body">
+      <p>Recupere les informations du tenant courant.</p>
+      <div class="label">Header</div>
+      <div class="code">X-API-Key: pb_a1b2c3d4e5f6...</div>
+    </div>
+  </div>
+
+  <!-- CSV IMPORT -->
+  <h2>Import CSV</h2>
+  <p>Methode la plus simple : exportez vos factures en CSV depuis votre logiciel comptable et envoyez-les. Les noms de colonnes sont flexibles (Francais ou Anglais).</p>
+
+  <div class="endpoint">
+    <div class="endpoint-head">
+      <span class="method method-post">POST</span>
+      <span class="path">/api/invoices/import-csv</span>
+    </div>
+    <div class="endpoint-body">
+      <div class="label">Query Parameters</div>
+      <table class="param-table">
+        <tr><th>Param</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        <tr><td>send</td><td>bool</td><td>true</td><td>false = validation seule, true = envoi Peppol</td></tr>
+      </table>
+      <div class="label">Header</div>
+      <div class="code">X-API-Key: pb_a1b2c3d4e5f6...
+Content-Type: text/csv</div>
+      <div class="label">CSV — Colonnes requises (noms flexibles)</div>
+      <table class="param-table">
+        <tr><th>Canonic</th><th>Noms acceptes</th></tr>
+        <tr><td><span class="required">invoice_number</span></td><td>numero, invoice_no, ref, facture_numero</td></tr>
+        <tr><td><span class="required">issue_date</span></td><td>date, invoice_date, date_facture</td></tr>
+        <tr><td><span class="required">seller_name</span></td><td>vendeur, emetteur_nom, supplier_name</td></tr>
+        <tr><td><span class="required">seller_endpoint</span></td><td>vendeur_endpoint, emetteur_id, emetteur_peppol</td></tr>
+        <tr><td><span class="required">seller_street</span></td><td>vendeur_rue, emetteur_adresse</td></tr>
+        <tr><td><span class="required">seller_city</span></td><td>vendeur_ville</td></tr>
+        <tr><td><span class="required">seller_postal</span></td><td>vendeur_cp, vendeur_code_postal</td></tr>
+        <tr><td><span class="required">seller_legal_id</span></td><td>vendeur_siret, vendeur_tva</td></tr>
+        <tr><td><span class="required">buyer_name</span></td><td>acheteur, client_nom, customer_name</td></tr>
+        <tr><td><span class="required">buyer_endpoint</span></td><td>acheteur_endpoint, client_id, acheteur_peppol</td></tr>
+        <tr><td><span class="required">buyer_street</span></td><td>acheteur_rue, client_rue</td></tr>
+        <tr><td><span class="required">buyer_city</span></td><td>acheteur_ville</td></tr>
+        <tr><td><span class="required">buyer_postal</span></td><td>acheteur_cp</td></tr>
+        <tr><td><span class="required">buyer_legal_id</span></td><td>acheteur_siret, client_siret</td></tr>
+        <tr><td><span class="required">line_description</span></td><td>description, libelle, designation</td></tr>
+        <tr><td><span class="required">line_quantity</span></td><td>quantite, qte, qty</td></tr>
+        <tr><td><span class="required">line_unit_price</span></td><td>prix_unitaire, pu, montant_ht</td></tr>
+        <tr><td><span class="optional">due_date</span></td><td>echeance, date_echeance</td></tr>
+        <tr><td><span class="optional">currency</span></td><td>devise (default: EUR)</td></tr>
+        <tr><td><span class="optional">line_tax_percent</span></td><td>tva_taux (default: 20.0)</td></tr>
+        <tr><td><span class="optional">line_tax_category</span></td><td>tva_categorie (default: S)</td></tr>
+      </table>
+      <div class="label">Exemple CSV</div>
+      <div class="code">invoice_number;issue_date;seller_name;seller_endpoint;seller_street;seller_city;seller_postal;seller_legal_id;buyer_name;buyer_endpoint;buyer_street;buyer_city;buyer_postal;buyer_legal_id;line_description;line_quantity;line_unit_price;line_tax_percent
+F-2026-001;2026-06-13;Ma Societe;9925:masiret;10 Rue de Paris;Paris;75001;12345678900012;Mon Client;9925:clientsiret;5 Av de Lyon;Lyon;69001;98765432100012;Prestation conseil;1;500.00;20.0
+F-2026-001;2026-06-13;Ma Societe;9925:masiret;10 Rue de Paris;Paris;75001;12345678900012;Mon Client;9925:clientsiret;5 Av de Lyon;Lyon;69001;98765432100012;Hebergement;2;75.00;20.0</div>
+      <p style="font-size:.85rem;color:var(--muted)">Note : deux lignes avec le meme invoice_number = deux lignes sur la meme facture.</p>
+      <div class="label">cURL</div>
+      <div class="code">curl -X POST "http://localhost:8000/api/invoices/import-csv?send=false" \
+  -H "X-API-Key: pb_a1b2c3d4e5f6..." \
+  -H "Content-Type: text/csv" \
+  --data-binary @factures.csv</div>
+      <div class="label">Response 200</div>
+      <div class="code">{
+  "imported": 1,
+  "warnings": [],
+  "invoices": [
+    {
+      "invoice_number": "F-2026-001",
+      "buyer": "Mon Client",
+      "xml_valid": true,
+      "xml_preview": "&lt;Invoice xmlns=...",
+      "sent": false,
+      "send_status": null
+    }
+  ]
+}</div>
+    </div>
+  </div>
+
+  <!-- WEBHOOK -->
+  <h2>Webhook JSON (temps reel)</h2>
+  <p>Poussez vos factures en temps reel via JSON. Ideal pour l'automatisation.</p>
+
+  <div class="endpoint">
+    <div class="endpoint-head">
+      <span class="method method-post">POST</span>
+      <span class="path">/api/webhook/invoices</span>
+    </div>
+    <div class="endpoint-body">
+      <div class="label">Header</div>
+      <div class="code">X-API-Key: pb_a1b2c3d4e5f6...
+Content-Type: application/json</div>
+      <div class="label">Request Body (InvoiceRequest JSON)</div>
+      <div class="code">{
+  "invoice_number": "F-2026-001",
+  "issue_date": "2026-06-13",
+  "due_date": "2026-07-13",
+  "currency": "EUR",
+  "buyer_reference": "REF-CLIENT-001",
+  "seller": {
+    "name": "Ma Societe SAS",
+    "endpoint_id": "9925:masiret",
+    "endpoint_scheme": "9915",
+    "street": "10 Rue de Paris",
+    "city": "Paris",
+    "postal_code": "75001",
+    "country_code": "FR",
+    "legal_id": "12345678900012",
+    "legal_id_scheme": "0002"
+  },
+  "buyer": {
+    "name": "Mon Client SARL",
+    "endpoint_id": "9925:clientsiret",
+    "endpoint_scheme": "9915",
+    "street": "5 Avenue de Lyon",
+    "city": "Lyon",
+    "postal_code": "69001",
+    "country_code": "FR",
+    "legal_id": "98765432100012",
+    "legal_id_scheme": "0002"
+  },
+  "lines": [
+    {
+      "description": "Prestation de conseil",
+      "quantity": 1,
+      "unit_price": 500.00,
+      "unit_code": "C62",
+      "tax_category": "S",
+      "tax_percent": 20.0
+    },
+    {
+      "description": "Hebergement mensuel",
+      "quantity": 2,
+      "unit_price": 75.00,
+      "unit_code": "C62",
+      "tax_category": "S",
+      "tax_percent": 20.0
+    }
+  ],
+  "payment_means_code": "30",
+  "iban": "FR7630006000011234567890189"
+}</div>
+      <div class="label">cURL</div>
+      <div class="code">curl -X POST "http://localhost:8000/api/webhook/invoices" \
+  -H "X-API-Key: pb_a1b2c3d4e5f6..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "invoice_number": "F-2026-001",
+    "issue_date": "2026-06-13",
+    "seller": {
+      "name": "Ma Societe",
+      "endpoint_id": "9925:masiret",
+      "street": "10 Rue de Paris",
+      "city": "Paris",
+      "postal_code": "75001",
+      "legal_id": "12345678900012"
+    },
+    "buyer": {
+      "name": "Mon Client",
+      "endpoint_id": "9925:clientsiret",
+      "street": "5 Av de Lyon",
+      "city": "Lyon",
+      "postal_code": "69001",
+      "legal_id": "98765432100012"
+    },
+    "lines": [
+      {"description": "Conseil", "quantity": 1, "unit_price": 500, "tax_percent": 20}
+    ]
+  }'</div>
+      <div class="label">Response 200</div>
+      <div class="code">{
+  "sent": true,
+  "invoice_number": "F-2026-001",
+  "tenant": "Mon Editeur SAS",
+  "superpdp_status": 200,
+  "superpdp_response": { ... }
+}</div>
+    </div>
+  </div>
+
+  <!-- DIRECT JSON (existing) -->
+  <h2>Envoi direct JSON (existant)</h2>
+  <p>L'endpoint d'origine pour envoyer une facture directement.</p>
+
+  <div class="endpoint">
+    <div class="endpoint-head">
+      <span class="method method-post">POST</span>
+      <span class="path">/invoices/send</span>
+    </div>
+    <div class="endpoint-body">
+      <p>Meme format JSON que le webhook. Ne necessite pas d'API key (utilise les credentials .env).</p>
+    </div>
+  </div>
+
+  <div class="endpoint">
+    <div class="endpoint-head">
+      <span class="method method-post">POST</span>
+      <span class="path">/invoices/build-xml</span>
+    </div>
+    <div class="endpoint-body">
+      <p>Construit l'XML UBL sans l'envoyer. Utile pour la validation.</p>
+    </div>
+  </div>
+
+  <div class="endpoint">
+    <div class="endpoint-head">
+      <span class="method method-post">POST</span>
+      <span class="path">/invoices/validate</span>
+    </div>
+    <div class="endpoint-body">
+      <p>Valide et sauvegarde la facture dans l'historique local.</p>
+    </div>
+  </div>
+
+  <!-- SANDBOX -->
+  <h2>Sandbox / Tests</h2>
+  <p>Pour tester sans envoyer de factures reelles sur le reseau Peppol :</p>
+  <ul>
+    <li>Utilisez <code>POST /api/invoices/import-csv?send=false</code> pour valider uniquement</li>
+    <li>Utilisez <code>POST /invoices/build-xml</code> pour generer l'XML sans envoi</li>
+    <li>Les factuves de test sont sauvegardees dans <code>invoice_history.json</code></li>
+  </ul>
+
+  <div class="warn">
+    ⚠️ <strong>Endpoint_id Peppol</strong> : le <code>endpoint_id</code> doit etre un identifiant Peppol valide (ex: <code>9925:FR12345678900012</code>). En sandbox, utilisez des IDs de test fournis par votre SMP.
+  </div>
+
+  <!-- ERRORS -->
+  <h2>Codes d'erreur</h2>
+  <table class="param-table">
+    <tr><th>Code</th><th>Signification</th></tr>
+    <tr><td>400</td><td>Donnees invalides (CSV mal forme, JSON incomplet)</td></tr>
+    <tr><td>401</td><td>API key manquante ou invalide</td></tr>
+    <tr><td>422</td><td>Validation Pydantic (champs manquants)</td></tr>
+    <tr><td>500</td><td>Erreur serveur ou SuperPDP indisponible</td></tr>
+  </table>
+
+</div>
+
+<footer class="footer">
+  Peppol Bridge — Couche d'integration Peppol pour editeurs SaaS / ERP<br>
+  <a href="/">Retour a l'accueil</a>
+</footer>
+</body>
+</html>

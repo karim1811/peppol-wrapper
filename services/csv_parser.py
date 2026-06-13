@@ -111,14 +111,27 @@ def parse_csv(csv_content: str) -> Tuple[List[InvoiceRequest], List[str]]:
     """
     Parse CSV content and return a list of InvoiceRequest objects.
     Returns (invoices, warnings).
+    Auto-detects delimiter (comma, semicolon, tab).
     """
     warnings: List[str] = []
-    reader = csv.reader(io.StringIO(csv_content))
+    
+    # Auto-detect delimiter
+    try:
+        sample = csv_content[:4096]
+        dialect = csv.Sniffer().sniff(sample, delimiters=",;\t")
+        delimiter = dialect.delimiter
+    except csv.Error:
+        delimiter = ","  # fallback
+    
+    reader = csv.reader(io.StringIO(csv_content), delimiter=delimiter)
     headers = next(reader, None)
     if not headers:
         raise ValueError("CSV vide ou sans en-tete")
 
     headers = [h.strip() for h in headers]
+    detected_delim = delimiter if delimiter != "," else "virgule"
+    detected_delim = detected_delim if detected_delim != ";" else "point-virgule"
+    print(f"  CSV delimiter detected: '{detected_delim}' ({len(headers)} columns)")
 
     # Resolve column indices
     def col(name: str, required: bool = True) -> int:
